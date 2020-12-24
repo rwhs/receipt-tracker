@@ -1,12 +1,28 @@
 import express from 'express';
-const app = express();
-const port = 8080;
+import { ApolloServer, gql } from 'apollo-server-express';
 
-app.get('/', (req, res) => {
-    res.send('Testing express route');
-    console.log('GET request on \'/\'')
+const app = express();
+const port = 8000;
+
+const typeDefs = gql`
+    type Query {
+        info: String!
+    }
+`
+
+const resolvers = {
+    Query: {
+        info: () => `This is a GraphQL resolver`
+    }
+}
+
+const server = new ApolloServer( {
+    typeDefs,
+    resolvers,
 })
 
-app.listen(port, () => {
-    console.log(`Express server started on port ${port}. Listening...`)
+server.applyMiddleware({ app, path: '/graphql' });
+
+app.listen({ port: port }, () => {
+    console.log(`Apollo Server listening on port ${port}`)
 })
