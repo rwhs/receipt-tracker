@@ -1,28 +1,49 @@
 import express from 'express';
 import { ApolloServer, gql } from 'apollo-server-express';
+import 'reflect-metadata';
+import { buildSchema } from 'type-graphql';
+import cors from 'cors';
+
+import { UserResolver } from './resolvers/UserResolver';
+import { mainModule } from 'process';
 
 const app = express();
 const port = 8000;
 
-const typeDefs = gql`
-    type Query {
-        info: String!
-    }
-`
+app.use(cors());
 
-const resolvers = {
-    Query: {
-        info: () => `This is a GraphQL resolver`
-    }
+// const typeDefs = gql`
+//     type Query {
+//         info: String!
+//     }
+// `
+
+// const resolvers = {
+//     Query: {
+//         info: () => `This is a GraphQL resolver`
+//     }
+// }
+
+// const server = new ApolloServer( {
+//     typeDefs,
+//     resolvers,
+// })
+
+const main = async () => {
+    const schema = await buildSchema({
+        resolvers: [UserResolver],
+        emitSchemaFile: true,
+    });
+
+    const server = new ApolloServer({schema});
+
+    server.applyMiddleware({ app, path: '/graphql' });
+
+    app.listen({ port: port }, () => {
+        console.log(`Apollo Server listening on port ${port}`)
+    });
 }
 
-const server = new ApolloServer( {
-    typeDefs,
-    resolvers,
-})
-
-server.applyMiddleware({ app, path: '/graphql' });
-
-app.listen({ port: port }, () => {
-    console.log(`Apollo Server listening on port ${port}`)
+main().catch((error) => {
+    console.log(error, 'error')
 })
