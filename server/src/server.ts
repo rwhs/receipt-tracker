@@ -4,8 +4,8 @@ import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import cors from 'cors';
 
-import { UserResolver } from './resolvers/UserResolver';
-import { mainModule } from 'process';
+import { UserResolver } from './resolvers/user-resolver';
+
 
 const app = express();
 const port = 8000;
